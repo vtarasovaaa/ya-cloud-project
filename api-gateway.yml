@@ -1,0 +1,35 @@
+openapi: 3.0.0
+info:
+  title: ya-cloud-project-notes
+  version: 1.0.0
+paths:
+  /:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket:             ya-cloud-project-notes-vtarasovaaa        # <-- имя бакета
+        object:             index.html                                # <-- имя html-файла
+        presigned_redirect: false
+        service_account:    $SERVICE_ACCOUNT_ID                       # <-- идентификатор сервисного аккаунта
+      operationId: static
+  /version:
+    get:
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: $SERVERLESS_CONTAINER_ID
+        service_account_id: $SERVICE_ACCOUNT_ID
+      operationId: version
+  /notes:
+    get:
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: $SERVERLESS_CONTAINER_ID
+        service_account_id: $SERVICE_ACCOUNT_ID
+      operationId: getNotes
+  /note:
+    post:
+      x-yc-apigateway-integration:
+        type: serverless_containers
+        container_id: $SERVERLESS_CONTAINER_ID
+        service_account_id: $SERVICE_ACCOUNT_ID
+      operationId: postNote

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="meta-info">
+        <p>Версия фронтенда: <span class="frontend-version"></span></p>
+        <p>Версия бекенда: <span class="backend-version"></span></p>
+        <p>Имя реплики бекенда: <span class="backend-name"></span></p>
+    </div>
+    <script>
+        function initVersions(){
+            fetch('/version', { method: 'GET' })
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('.frontend-version').textContent = data.front_version;
+                    document.querySelector('.backend-version').textContent = data.version;
+                    document.querySelector('.backend-name').textContent = data.name;
+                });
+        }
+
+        initVersions();
+    </script>
+    <script>
+        function createNoteItem(author, text){
+            let container = document.createElement('li');
+            let authorElement = document.createElement('p');
+            let textElement = document.createElement('p');
+
+            container.classList.add("notes-item");
+            authorElement.textContent = author;
+            textElement.textContent = text;
+
+            container.appendChild(authorElement);
+            container.appendChild(textElement);
+
+            return container;
+        };
+
+        function submitNote() {
+            const author = document.getElementById("author").value || 'Аноним';
+            const content = document.getElementById("text").value;
+
+            if (!content) {
+                return;
+            }
+
+            fetch('/note', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({author: author, text: content})
+            })
+            document.querySelector(".notes-list").appendChild(createNoteItem(author, content));
+        }
+    </script>
+    <h1>I know what you feel</h1>
+    <h2>Можете здесь написать что угодно: поныть, поделиться радостью, рассказать анекдот</h2>
+    <form class="notes-add-form" action="javascript:submitNote()">
+        <label>
+            Представьтесь, если хотите:
+            <br>
+            <input type="text" id="author" placeholder="Аноним">
+        </label>
+        <br>
+        <label>
+            Здесь можете написать что угодно:
+            <br>
+            <textarea id="text" cols="40" rows="10"></textarea>
+        </label>
+        <br>
+        <button>Поделиться</button>
+    </form>
+    <ul class="notes-list">
+
+    </ul>
+    <script>
+        function createNoteItem(author, text){
+            let container = document.createElement('li');
+            let authorElement = document.createElement('h4');
+            let textElement = document.createElement('p');
+
+            container.classList.add("notes-item");
+            authorElement.textContent = author;
+            textElement.textContent = text;
+
+            container.appendChild(authorElement);
+            container.appendChild(textElement);
+
+            return container;
+        };
+
+        function initNotesList() {
+            fetch('/notes', {method: 'GET'})
+            .then(response => response.json())
+            .then(data => {
+                data.notes.forEach(note => {
+                    let noteItem = createNoteItem(note.author, note.text);
+                    document.querySelector(".notes-list").appendChild(noteItem);
+                });
+            });
+        }
+
+        initNotesList();
+    </script>
+</body>
+</html>
